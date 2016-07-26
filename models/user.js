@@ -1,6 +1,8 @@
 'use strict';
+var passportLocalSequelize = require('passport-local-sequelize');
+
 module.exports = function(sequelize, DataTypes) {
-  var User = sequelize.define('User', {
+  var User = passportLocalSequelize.defineUser(sequelize, {
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
     bio: DataTypes.TEXT

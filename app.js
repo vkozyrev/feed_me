@@ -4,11 +4,14 @@
     , express = require('express')
     , favicon = require('serve-favicon')
     , logger = require('morgan')
+    , passport = require('passport')
     , path = require('path')
+    , session = require('express-session')
     
 // requires
     , routes = require('./routes/index')
     , users = require('./routes/users')
+    , models = require('./models')
 
 // variables
     , app = express()
@@ -28,6 +31,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.set('trust proxy', 1) // trust first proxy 
+app.use(session({
+  secret: 'kjT928(nd$N8s',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(models.User.createStrategy());
+passport.serializeUser(models.User.serializeUser());
+passport.deserializeUser(models.User.deserializeUser());
 
 app.use('/', routes);
 app.use('/users', users);

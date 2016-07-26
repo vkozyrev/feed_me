@@ -8,6 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      username: {
+        allowNull: false,
+        unique: true,
+        type: Sequelize.STRING
+      },
       first_name: {
         type: Sequelize.STRING
       },
@@ -16,6 +21,26 @@ module.exports = {
       },
       bio: {
         type: Sequelize.TEXT
+      },
+      hash: {
+        allowNull: false,
+        type: Sequelize.TEXT
+      },
+      salt: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      activationKey: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      resetPasswordKey: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
