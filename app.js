@@ -1,18 +1,25 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+// services
+  var bodyParser = require('body-parser')
+    , cookieParser = require('cookie-parser')
+    , express = require('express')
+    , favicon = require('serve-favicon')
+    , logger = require('morgan')
+    , path = require('path')
+    
+// requires
+    , routes = require('./routes/index')
+    , users = require('./routes/users')
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+// variables
+    , app = express()
+    , swig = require('swig');
 
-var app = express();
+// Swig Template
+app.engine('html', swig.renderFile);
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
