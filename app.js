@@ -1,3 +1,5 @@
+'use strict'
+
 // services
   var bodyParser = require('body-parser')
     , cookieParser = require('cookie-parser')
@@ -10,7 +12,8 @@
     
 // requires
     , routes = require('./routes/index')
-    , users = require('./routes/users')
+    , usersRoutes = require('./routes/users')
+    , registerRoutes = require('./routes/register')
     , models = require('./models')
 
 // variables
@@ -45,7 +48,8 @@ passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/', registerRoutes);
+app.use('/users', usersRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
