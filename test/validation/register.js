@@ -3,7 +3,6 @@
 var Joi = require('joi');
 
 module.exports.post = {
-  options: { flatten: true },
   body: {
     username: Joi.string().required().alphanum(),
     email: Joi.string().required().email(),
