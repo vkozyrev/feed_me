@@ -12,6 +12,7 @@ describe('validate body and flatten errors', function () {
     it('should return a 400 ok response and two errors flattened', function (done) {
 
       var register = {
+        username: '',
         email: '',
         password: ''
       };
@@ -21,9 +22,8 @@ describe('validate body and flatten errors', function () {
         .send(register)
         .expect(400)
         .end(function (err, res) {
-          console.log(res.text);
           var response = JSON.parse(res.text);
-          assert.equal(4, response.length);
+          assert.equal(5, response.length);
           done();
         });
     });
