@@ -9,6 +9,7 @@
     , passport = require('passport')
     , path = require('path')
     , session = require('express-session')
+    , validation = require('express-validation')
     
 // requires
     , routes = require('./routes/index')
@@ -58,12 +59,11 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
+    if (err instanceof validation.ValidationError) return res.status(err.status).json(err);
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -75,12 +75,12 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  if (err instanceof validation.ValidationError) return res.status(err.status).json(err);
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
     error: {}
   });
 });
-
 
 module.exports = app;
