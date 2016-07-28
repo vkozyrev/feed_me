@@ -23,7 +23,7 @@ describe('validate body and flatten errors', function () {
         .expect(400)
         .end(function (err, res) {
           var response = JSON.parse(res.text);
-          assert.equal(5, response.length);
+          assert.equal(6, response.length);
           done();
         });
     });
