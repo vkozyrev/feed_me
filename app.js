@@ -4,7 +4,9 @@
   var bodyParser = require('body-parser')
     , cookieParser = require('cookie-parser')
     , express = require('express')
+    , ExtractJwt = require('passport-jwt').ExtractJwt
     , favicon = require('serve-favicon')
+    , JwtStrategy = require('passport-jwt').Strategy
     , logger = require('morgan')
     , passport = require('passport')
     , path = require('path')
@@ -33,18 +35,33 @@ app.set('views', __dirname + '/views');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('trust proxy', 1) // trust first proxy 
+/*
 app.use(session({
   secret: 'kjT928(nd$N8s',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true }
 }));
+*/
 app.use(passport.initialize());
-app.use(passport.session());
-passport.use(models.User.createStrategy());
+//app.use(passport.session());
+//passport.use(models.User.createStrategy());
+passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
+  models.User.findOne({id: jwt_payload.sub}, function (err, user) {
+    if (err) {
+      return done(err, false);
+    }
+    if (user) {
+      done(null, user);
+    } else {
+      done(null, false);
+      // or you could create a new account
+    }
+  });
+}));
 passport.serializeUser(models.User.serializeUser());
 passport.deserializeUser(models.User.deserializeUser());
 
