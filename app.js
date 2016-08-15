@@ -49,7 +49,12 @@ app.use(session({
 app.use(passport.initialize());
 //app.use(passport.session());
 //passport.use(models.User.createStrategy());
-passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
+var options = {}
+options.jwtFromRequest = ExtractJwt.fromAuthHeader();
+options.secretOrKey = 'secret';
+options.issuer = "accounts.examplesoft.com";
+options.audience = "yoursite.net";
+passport.use(new JwtStrategy(options, function (jwt_payload, done) {
   models.User.findOne({id: jwt_payload.sub}, function (err, user) {
     if (err) {
       return done(err, false);

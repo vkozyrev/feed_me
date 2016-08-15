@@ -1,6 +1,7 @@
 'use strict'
 
-var passport = require('passport');
+var passport = require('passport')
+  , Promise = require('bluebird');
 
 var User = require('../models').User;
 
@@ -10,13 +11,15 @@ module.exports = {
       username: req.body.username.toLowerCase(),
       displayUsername: req.body.username
     });
-    User.register(user, req.body.password, function (error, user) {
-      if (error) {
-        return next(error);
-      }
-      passport.authenticate('local')(req, res, function () {
-        res.send(200, user.attributes);
-      });
+
+    user.register(req.body.password)
+    .then(user.save)
+    .then(function () {
+      res.sendStatus(200);
+    })
+    .catch(function (error) {
+      console.log(error);
+      res.status(500).send({ error: error.message });
     });
   }
 };
