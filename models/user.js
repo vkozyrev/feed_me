@@ -1,6 +1,8 @@
 'use strict';
 
-var async = require('async')
+var _ = require('lodash')
+  , async = require('async')
+  , jwt = require('jsonwebtoken')
   , Promise = require('bluebird')
   , randomBytes = Promise.promisify(require('crypto').randomBytes)
   , pbkdf2 = Promise.promisify(require('crypto').pbkdf2);
@@ -15,6 +17,10 @@ module.exports = function(sequelize, DataTypes) {
     displayUsername: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     hash: {
       type: DataTypes.STRING,
@@ -42,15 +48,21 @@ module.exports = function(sequelize, DataTypes) {
       },
       serializeUser: function () {
         return function (user, cb) {
-          cb(null, user.get(options.usernameField));
+          cb(null, user.username);
         };
       },
       deserializeUser: function () {
         var self = this;
         return function (username, cb) {
+          console.log('Running');
+          console.log(username);
           self.find({ where: { username: self.username }})
-          .then(cb)
-          .catch(cb)
+          .then(function (user) {
+            return cb(null, user);
+          })
+          .catch(function (error) {
+            return cb(error);
+          })
         };
       }
     },
@@ -86,6 +98,31 @@ module.exports = function(sequelize, DataTypes) {
           this.hash = new Buffer(hashRaw, 'binary').toString('hex');
           this.salt = options.salt;
         });
+      },
+      comparePassword: function (password) {
+        var options = 
+          { iterations:  12000,
+            keylen:  512
+          };
+
+        return Promise.bind(this)
+        .then(function () {
+          return pbkdf2(password, this.salt, options.iterations, options.keylen);
+        })
+        .then(function (hashRaw) {
+          var hash = new Buffer(hashRaw, 'binary').toString('hex');
+          if (hash !== this.hash) {
+            throw new Error('Incorrect_Password');
+          }
+          return true;
+        });
+      },
+      generateToken: function () {
+        // <TODO> move secret to config file
+        return jwt.sign({ }, 'secret', { issuer: 'accounts.examplesoft.com', audience: 'yoursite.net', subject: this.id.toString() });
+      },
+      filter: function () {
+        return _.omit(_.pick(this, this.attributes), ['hash', 'salt', 'activationKey', 'resetPasswordKey']);   
       }
     }
   });

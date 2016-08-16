@@ -10,15 +10,13 @@ router.route('/register')
 .get(function(req, res, next) {
   res.json({ Page: "GET Register"});
 })
-.post(validate(validation.register.post), registerController.postRegister);
+.post(validate(validation.register.register.post), registerController.postRegister);
 
 router.route('/login')
 .get(function(req, res, next) {
   res.json({ Page:'GET Login' });
 })
-.post(function(req, res, next) {
-  res.json({ Page: 'POST Login' });
-});
+.post(validate(validation.register.login.post), registerController.postLogin);
 
 router.route('/logout')
 .post(function (req, res, next) {

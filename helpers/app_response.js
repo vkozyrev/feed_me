@@ -1,9 +1,9 @@
 'use strict'
 
-var _ = require('lodash'),
+var _ = require('lodash');
 
 module.exports = {
-  createResponse = function(options) {
+  createResponse: function (options) {
     var defaultOptions = {
       status: 200,
       statusText: 'OK',
@@ -11,26 +11,23 @@ module.exports = {
       errors: null
     }
 
-    return _.defaults(options || {}, defaultAttachOptions);
-  };
-
-  createResponseOK = function (data) {
-    return createResponse({ data: data });
-  };
-
-  createResponseError = function (code, error) {
-    return createResponse({
+    return _.defaults(options || {}, defaultOptions);
+  },
+  createResponseOK: function (data) {
+    return this.createResponse({ data: data });
+  },
+  createResponseError: function (code, error) {
+    return this.createResponse({
       status: code,
       statusText: 'INTERNAL ERROR',
       errors: [ error ]
     });
-  };
-
-  createResponseErrors = function (code, errors) {
-    return createResponse({ 
+  },
+  createResponseErrors: function (code, errors) {
+    return this.createResponse({ 
       status: code,
       statusText: 'INTERNAL ERROR',
       errors: errors
     });
-  };
+  }
 };

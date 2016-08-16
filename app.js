@@ -15,7 +15,7 @@
     
 // requires
     , routes = require('./routes/index')
-    , usersRoutes = require('./routes/users')
+    , userRoutes = require('./routes/user')
     , registerRoutes = require('./routes/register')
     , models = require('./models')
 
@@ -55,16 +55,13 @@ options.secretOrKey = 'secret';
 options.issuer = "accounts.examplesoft.com";
 options.audience = "yoursite.net";
 passport.use(new JwtStrategy(options, function (jwt_payload, done) {
-  models.User.findOne({id: jwt_payload.sub}, function (err, user) {
-    if (err) {
-      return done(err, false);
-    }
-    if (user) {
-      done(null, user);
-    } else {
-      done(null, false);
-      // or you could create a new account
-    }
+  models.User.findOne({ where: { id: jwt_payload.sub }})
+  .then(function (user) {
+    if (user) { done(null, user); }
+    else { done(null, false); }
+  })
+  .catch(function (error) {
+    done(error, false);
   });
 }));
 passport.serializeUser(models.User.serializeUser());
@@ -72,7 +69,7 @@ passport.deserializeUser(models.User.deserializeUser());
 
 app.use('/', routes);
 app.use('/', registerRoutes);
-app.use('/users', usersRoutes);
+app.use('/user', userRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -86,6 +83,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     if (err instanceof validation.ValidationError) return res.status(err.status).json(err);
+    console.log(err);
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
