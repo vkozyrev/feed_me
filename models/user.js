@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash')
+  , AppErrors = require('../errors')
   , async = require('async')
   , jwt = require('jsonwebtoken')
   , Promise = require('bluebird')
@@ -54,8 +55,6 @@ module.exports = function(sequelize, DataTypes) {
       deserializeUser: function () {
         var self = this;
         return function (username, cb) {
-          console.log('Running');
-          console.log(username);
           self.find({ where: { username: self.username }})
           .then(function (user) {
             return cb(null, user);
@@ -70,10 +69,12 @@ module.exports = function(sequelize, DataTypes) {
       register: function (password) {
         return Promise.bind(this)
         .then(function () {
-          return this.Model.find({ where: { username: this.username }})
+          return this.Model.find({ where: { $or: { username: this.username, email: this.email }}})
         })
         .then(function (existingUser) {
-          if (existingUser) { throw new Error('Existing_User'); }
+          if (existingUser) { 
+            throw (existingUser.email === this.email) ? AppErrors.emailTaken() : AppErrors.usernameTaken();
+          }
           return password;
         }) 
         .then(this.setPassword);
@@ -112,7 +113,7 @@ module.exports = function(sequelize, DataTypes) {
         .then(function (hashRaw) {
           var hash = new Buffer(hashRaw, 'binary').toString('hex');
           if (hash !== this.hash) {
-            throw new Error('Incorrect_Password');
+            throw new AppErrors.passwordMismatch();
           }
           return true;
         });

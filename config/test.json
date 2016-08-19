@@ -1,0 +1,13 @@
+{
+  "Server": {
+    "database": {
+      "name": "travel_app_test",
+      "username": "developer",
+      "password": "developer",
+      "options": {
+        "dialect": "mysql",
+        "host": "localhost"
+      }
+    }
+  }
+}

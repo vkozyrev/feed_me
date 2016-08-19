@@ -11,6 +11,6 @@ var User = require('../models').User;
 
 module.exports = {
   get: function (req, res, next) {
-    res.status(200).send(AppResponse.createResponseOK({ user: req.user.filter()}));
+    res.status(200).json(AppResponse.createResponseOK({ user: req.user.filter()}));
   }
 };

@@ -4,10 +4,11 @@
 var Promise = require('bluebird')
 
 // Requires
-  , AppResponse = require('../helpers/app_response');
+  , AppResponse = require('../helpers/app_response')
+  , AppErrors = require('../errors')
 
 // Models
-var User = require('../models').User;
+  , User = require('../models').User;
 
 module.exports = {
   postLogin: function (req, res, next) {
@@ -15,6 +16,9 @@ module.exports = {
 
     User.findOne({ where: { email: req.body.email }})
     .then(function (user) {
+      if (!user) {
+        throw AppErrors.loginFailed();
+      }
       scope.user = user;
     })
     .then(function () {
@@ -24,11 +28,14 @@ module.exports = {
       return scope.user.generateToken();
     })
     .then(function (token) {
-      res.status(200).send(AppResponse.createResponseOK({ token: token, user: scope.user.filter() }));
+      res.status(200).json(AppResponse.createResponseOK({ token: token, user: scope.user.filter() }));
     })
     .catch(function (error) {
-      console.log(error);
-      res.status(500).send({ error: error.message });
+      // <TODO> modify error system to not use strings like this.
+      if (error.type === 'Password_Mismatch') {
+        return next(AppErrors.loginFailed());
+      }
+      next(error);
     });
   },
   postRegister: function (req, res, next) {
@@ -42,11 +49,10 @@ module.exports = {
     .then(user.save)
     .then(user.generateToken)
     .then(function (token) {
-      res.status(200).send(AppResponse.createResponseOK({ token: token, user: this.filter() }));
+      res.status(200).json(AppResponse.createResponseOK({ token: token, user: this.filter() }));
     })
     .catch(function (error) {
-      console.log(error);
-      res.status(500).send({ error: error.message });
+      next(error);
     });
   }
 };

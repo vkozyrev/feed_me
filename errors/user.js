@@ -1,26 +1,18 @@
-var util = require( "util" );
+'use strict'
 
-exports.AppError = AppError;
+var AppError = require('./app_error');
 
-exports.createAppError = createAppError;
-
-function createAppError(settings) {
-
-    // NOTE: We are overriding the "implementationContext" so that the createAppError()
-    // function is not part of the resulting stacktrace.
-    return(new AppError(settings, createAppError));
+// Model Errors
+exports.usernameTaken = function () {
+  return new AppError({ type: 'Username_Taken' });
 };
 
-function AppError(settings, implementationContext) {
-    settings = (settings || {});
-    this.name = "AppError";
-    this.type = (settings.type || "Application");
-    this.message = (settings.message || "An error occurred.");
-    this.detail = (settings.detail || "" );
-    this.extendedInfo = (settings.extendedInfo || "");
-    this.errorCode = (settings.errorCode || "");
-    this.isAppError = true;
-    Error.captureStackTrace(this, (implementationContext || AppError));
+exports.emailTaken = function () {
+  return new AppError({ type: 'Email_Taken' });
 };
 
-util.inherits(AppError, Error);
+exports.passwordMismatch = function () {
+  return new AppError({ type: 'Password_Mismatch' })
+};
+
+// Controller Errors

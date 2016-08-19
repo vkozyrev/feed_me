@@ -8,7 +8,7 @@ module.exports = {
       status: 200,
       statusText: 'OK',
       data: null,
-      errors: null
+      error: null
     }
 
     return _.defaults(options || {}, defaultOptions);
@@ -19,15 +19,8 @@ module.exports = {
   createResponseError: function (code, error) {
     return this.createResponse({
       status: code,
-      statusText: 'INTERNAL ERROR',
-      errors: [ error ]
-    });
-  },
-  createResponseErrors: function (code, errors) {
-    return this.createResponse({ 
-      status: code,
-      statusText: 'INTERNAL ERROR',
-      errors: errors
+      statusText: 'INTERNAL_ERROR',
+      error: error
     });
   }
 };

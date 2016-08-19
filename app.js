@@ -14,10 +14,11 @@
     , validation = require('express-validation')
     
 // requires
+    , AppResponse = require('./helpers/app_response')
+    , models = require('./models')
+    , registerRoutes = require('./routes/register')
     , routes = require('./routes/index')
     , userRoutes = require('./routes/user')
-    , registerRoutes = require('./routes/register')
-    , models = require('./models')
 
 // variables
     , app = express()
@@ -81,14 +82,9 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    if (err instanceof validation.ValidationError) return res.status(err.status).json(err);
-    console.log(err);
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
+  app.use(function(error, req, res, next) {
+    if (error instanceof validation.ValidationError) return res.status(error.status).json(error);
+    res.status(error.status || 500).json(AppResponse.createResponseError(500, error));
   });
 }
 
@@ -96,11 +92,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   if (err instanceof validation.ValidationError) return res.status(err.status).json(err);
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+  res.status(err.status || 500).json(err);
 });
 
 module.exports = app;
