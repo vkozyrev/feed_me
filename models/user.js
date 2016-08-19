@@ -47,6 +47,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function (models) {
         // associations can be defined here
       },
+      // <TODO> Figure out what these do, when they are called and debug them
       serializeUser: function () {
         return function (user, cb) {
           cb(null, user.username);
@@ -73,7 +74,7 @@ module.exports = function(sequelize, DataTypes) {
         })
         .then(function (existingUser) {
           if (existingUser) { 
-            throw (existingUser.email === this.email) ? AppErrors.emailTaken() : AppErrors.usernameTaken();
+            throw (existingUser.email === this.email) ? new AppErrors.EmailTakenError() : new AppErrors.UsernameTakenError();
           }
           return password;
         }) 
@@ -113,7 +114,7 @@ module.exports = function(sequelize, DataTypes) {
         .then(function (hashRaw) {
           var hash = new Buffer(hashRaw, 'binary').toString('hex');
           if (hash !== this.hash) {
-            throw new AppErrors.passwordMismatch();
+            throw new AppErrors.PasswordMismatchError();
           }
           return true;
         });

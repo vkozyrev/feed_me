@@ -1,10 +1,10 @@
 'use strict'
 
-var AppError = require('./app_error');
+var AppError = require('./app_error').AppError
+  , util = require('util');
 
-// Model Errors
-
-// Controller Errors
-exports.loginFailed = function () {
-  return new AppError({ type: 'Login_Failed'});
+exports.LoginFailedError = LoginFailedError;
+function LoginFailedError() {
+  AppError.call(this, { type: 'Login_Failed' });
 };
+util.inherits(LoginFailedError, AppError);

@@ -1,18 +1,22 @@
 'use strict'
 
-var AppError = require('./app_error');
+var AppError = require('./app_error').AppError
+  , util = require('util');
 
-// Model Errors
-exports.usernameTaken = function () {
-  return new AppError({ type: 'Username_Taken' });
+exports.EmailTakenError = EmailTakenError;
+function EmailTakenError() {
+  AppError.call(this, { type: 'Email_Taken' });
 };
+util.inherits(EmailTakenError, AppError);
 
-exports.emailTaken = function () {
-  return new AppError({ type: 'Email_Taken' });
+exports.PasswordMismatchError = PasswordMismatchError;
+function PasswordMismatchError() {
+  AppError.call(this, { type: 'Password_Mismatch' });
 };
+util.inherits(PasswordMismatchError, AppError);
 
-exports.passwordMismatch = function () {
-  return new AppError({ type: 'Password_Mismatch' })
+exports.UsernameTakenError = UsernameTakenError;
+function UsernameTakenError() {
+  AppError.call(this, { type: 'Username_Taken' });
 };
-
-// Controller Errors
+util.inherits(PasswordMismatchError, AppError);

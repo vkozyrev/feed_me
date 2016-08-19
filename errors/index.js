@@ -2,4 +2,4 @@
 
 var _ = require('lodash');
 
-_.merge(exports, require('./user'), require('./register'), require('./app_error'));
+_.merge(exports, require('./app_error'), require('./user'), require('./register'));

@@ -1,9 +1,9 @@
 'use strict'
 
 var _ = require('lodash')
-  , util = require( "util" );
+  , util = require('util');
 
-module.exports = AppError;
+exports.AppError = AppError;
 
 function AppError(settings, implementationContext) {
   settings = (settings || {});

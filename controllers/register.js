@@ -17,7 +17,7 @@ module.exports = {
     User.findOne({ where: { email: req.body.email }})
     .then(function (user) {
       if (!user) {
-        throw AppErrors.loginFailed();
+        throw new AppErrors.LoginFailedError();
       }
       scope.user = user;
     })
@@ -31,9 +31,9 @@ module.exports = {
       res.status(200).json(AppResponse.createResponseOK({ token: token, user: scope.user.filter() }));
     })
     .catch(function (error) {
-      // <TODO> modify error system to not use strings like this.
-      if (error.type === 'Password_Mismatch') {
-        return next(AppErrors.loginFailed());
+      // Don't show what caused login fail
+      if (error instanceof AppErrors.AppError) {
+        return next(new AppErrors.LoginFailedError());
       }
       next(error);
     });
