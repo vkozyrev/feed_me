@@ -6,7 +6,7 @@ var _ = require('lodash')
   , jwt = require('jsonwebtoken')
   , Promise = require('bluebird')
   , randomBytes = Promise.promisify(require('crypto').randomBytes)
-  , pbkdf2 = Promise.promisify(require('crypto').pbkdf2);
+  , crypto = require('crypto');
 
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('User', {
@@ -78,6 +78,7 @@ module.exports = function(sequelize, DataTypes) {
           }
           return password;
         }) 
+        // <TODO> Should I call this here or in the controller to be more explicit (this does make testing easier)
         .then(this.setPassword);
       },
       setPassword: function (password) {
@@ -94,11 +95,12 @@ module.exports = function(sequelize, DataTypes) {
         })
         .then(function (buffer) {
           options.salt = buffer.toString('hex');
-          return pbkdf2(password, options.salt, options.iterations, options.keylen);
+          return require('crypto').pbkdf2Sync(password, options.salt, options.iterations, options.keylen, 'sha512');
         })
         .then(function (hashRaw) {
           this.hash = new Buffer(hashRaw, 'binary').toString('hex');
           this.salt = options.salt;
+          return this;
         });
       },
       comparePassword: function (password) {
@@ -109,7 +111,7 @@ module.exports = function(sequelize, DataTypes) {
 
         return Promise.bind(this)
         .then(function () {
-          return pbkdf2(password, this.salt, options.iterations, options.keylen);
+          return crypto.pbkdf2Sync(password, this.salt, options.iterations, options.keylen, 'sha512');
         })
         .then(function (hashRaw) {
           var hash = new Buffer(hashRaw, 'binary').toString('hex');

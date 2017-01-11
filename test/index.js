@@ -1,3 +1,3 @@
 'use strict';
 
-exports.register = require('./register');
+exports.registerController = require('./controllers/register');
