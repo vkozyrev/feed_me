@@ -1,7 +1,7 @@
 {
   "Server": {
     "database": {
-      "name": "travel_app_test",
+      "name": "feed_me_test",
       "username": "developer",
       "password": "developer",
       "options": {

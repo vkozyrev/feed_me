@@ -6,7 +6,6 @@ module.exports = {
   createResponse: function (options) {
     var defaultOptions = {
       status: 200,
-      statusText: 'Ok',
       data: null,
       error: null
     }
@@ -16,10 +15,9 @@ module.exports = {
   createResponseOK: function (data) {
     return this.createResponse({ data: data });
   },
-  createResponseError: function (code, statusText, error) {
+  createResponseError: function (code, error) {
     return this.createResponse({
       status: code,
-      statusText: statusText || 'Error',
       error: error
     });
   }

@@ -1,6 +1,8 @@
 // Services
+var assert = require('chai').assert
+
 // Requires
-var sequelize = require('../models').sequelize
+  , sequelize = require('../models').sequelize
 
 // Models and Controllers
   , User = require('../models').User;

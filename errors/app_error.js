@@ -9,7 +9,7 @@ function AppError(settings, implementationContext) {
   this.name = "AppError";
   this.type = (settings.type || "Application");
   this.message = (settings.message || "An error occurred.");
-  this.extendedInfo = (settings.extendedInfo || "");
+  this.extendedInfo = (settings.extendedInfo || null);
   this.status = (settings.status || 500);
   Error.captureStackTrace(this, (implementationContext || AppError));
 };

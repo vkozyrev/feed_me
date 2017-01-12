@@ -18,311 +18,200 @@ var Promise = require('bluebird')
   , User = require('../../models').User
   , registerController = require('../../controllers').register;
 
-var testData = [
-  { describe: 'Test registration controller',
-    next: [
-      { describe: '/register input validation',
-        next: [
-          { describe: 'Just a test',
-            next: [
-              { it: 'ABCHJSAHJGSADJHDSAshould return a 400 response and 3 errors when the request has multiple missing items in payload',
-                errorsLength: 3,
-                responseCode: 400,
-                payload: {
-                  username: '',
-                  email: '',
-                  password: '' 
-                }
-              },
-              { it: 'KKKSJDUHDUUUUUUUUUshould return a 400 response and 3 errors when the request has multiple missing items in payload',
-                errorsLength: 3,
-                responseCode: 400,
-                payload: {
-                  username: '',
-                  email: '',
-                  password: '' 
-                }
-              }
-            ]
-          },
-          { it: 'should return a 400 response and 3 errors when the request has multiple missing items in payload',
-            errorsLength: 3,
-            responseCode: 400,
-            payload: {
-              username: '',
-              email: '',
-              password: '' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when the request has 1 missing item in payload',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing',
-              email: 'test@testing.com',
-              password: '' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when username too short',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'test6',
-              email: 'test@testing.com',
-              password: 'testing1' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when username is too long',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testingtestingtesting',
-              email: 'test@testing.com',
-              password: 'testing1' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when username has illegal characters',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing_',
-              email: 'test@testing.com',
-              password: 'testing1' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when given invalid email',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing',
-              email: 'testsomemail.com',
-              password: 'testing1' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when given too short password',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing',
-              email: 'test@testing.com',
-              password: 'test1ng' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when given password with no letters',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing',
-              email: 'test@testing.com',
-              password: '123456789' 
-            }
-          },
-          { it: 'should return a 400 response and 1 errors when given password with no numbers',
-            errorsLength: 1,
-            responseCode: 400,
-            payload: {
-              username: 'testing',
-              email: 'test@testing.com',
-              password: 'testtest' 
-            }
-          },
-          { it: 'should return a 200 ok when given valid data',
-            errorsLength: 0,
-            responseCode: 200,
-            payload: {
-              username: 'testing',
-              email: 'test@testing.com',
-              password: 'testtest1' 
-            }
-          }
-        ],
-      },
-      {
-        describe: '/register controller',
-        testCases: []
-      },
-      {
-        describe: '/login intput validation',
-        testCases: []
-      },
-      {
-        describe: '/login controller',
-        testCases: []
-      }
-    ]
-  }
-];
-
-function recursiveTestBuilder(testObj) {
-  if (Array.isArray(testObj)) {
-    testObj.forEach(element => { recursiveTestBuilder(element); });
-  }
-  else if ('next' in testObj) {
-    describe(testObj.describe, () => { recursiveTestBuilder(testObj.next); });
-    if ('beforeEach' in testObj) { beforeEach(testObj.beforeEach.description, testObj.beforeEach.function); }
-    if ('afterEach' in testObj) { afterEach(testObj.afterEach.description, testObj.afterEach.function); }
-  }
-  else if ('it' in testObj) {
-    it(testObj.it, function () {
-      return request(app)
-      .post('/register')
-      .send(testObj.payload)
-      .expect(testObj.responseCode)
-      .then(function (res) {
-        var response = JSON.parse(res.text);
-        if (testObj.statusText === 'Validation_Error') { assert.equal(testObj.error.errorsLength, response.error.errors.length); }
-      })
-      .catch(function (error) {
-        assert.ifError(error);
-      });
-    });
-  }
-};
-
-recursiveTestBuilder(testData);
-
-/*
-testData.forEach(function (testCase) {
-  describe(testCase.describe, function () {
-    it (testCase.it, function () {
-      return request(app)
-      .post('/register')
-      .send(testCase.payload)
-      .expect(testCase.responseCode)
-      .then(function (res) {
-        var response = JSON.parse(res.text);
-        if (testCase.statusText === 'Validation_Error') { assert.equal(testCase.error.errorsLength, response.error.errors.length); }
-      })
-      .catch(function (error) {
-        assert.ifError(error);
-      })
-    });
-  });
-});
-*/
-/*
 describe('Test registration controller', function () {
 
   beforeEach('Clear User Database', testUtils.User.clearUserDatabase);
 
   describe('/register input validation', function () {
-    var testData = [
-    { describe: 'when the request has multiple missing items in payload',
-      it: 'should return a 400 ok response and 3 errors',
-      errorsLength: 3,
-      responseCode: 400,
-      payload: {
+
+    it('should return a 400 response with error type Validation_Error containing 3 items in extendedInfo when there are 3 missing items in payload', function () {
+      var payload = {
         username: '',
         email: '',
         password: '' 
-      }
-    },
-    { describe: 'when the request has 1 missing item in payload',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(3, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when there is 1 missing item in payload', function () {
+      var payload = {
         username: 'testing',
         email: 'test@testing.com',
-        password: '' 
-      }
-    },
-    { describe: 'when username too short',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+        password: ''
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when username too short', function () {
+      var payload = {
         username: 'test6',
         email: 'test@testing.com',
         password: 'testing1' 
-      }
-    },
-    { describe: 'when username is too long',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when username is too long', function () {
+      var payload = {
         username: 'testingtestingtesting',
         email: 'test@testing.com',
         password: 'testing1' 
-      }
-    },
-    { describe: 'when username has illegal characters',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when username has illegal characters', function () {
+      var payload = {
         username: 'testing_',
         email: 'test@testing.com',
         password: 'testing1' 
-      }
-    },
-    { describe: 'when given invalid email',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when given invalid email', function () {
+      var payload = {
         username: 'testing',
         email: 'testsomemail.com',
         password: 'testing1' 
-      }
-    },
-    { describe: 'when given too short password',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when given too short password', function () {
+      var payload = {
         username: 'testing',
         email: 'test@testing.com',
-        password: 'test1ng' 
-      }
-    },
-    { describe: 'when given password with no letters',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+        password: 'test1ng'
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when given password with no letters', function () {
+      var payload = {
         username: 'testing',
         email: 'test@testing.com',
         password: '123456789' 
-      }
-    },
-    { describe: 'when given password with no numbers',
-      it: 'should return a 400 ok response and 1 errors',
-      errorsLength: 1,
-      responseCode: 400,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    it('should return a 400 response with error type Validation_Error containing 1 item in extendedInfo when given password with no numbers', function () {
+      var payload = {
         username: 'testing',
         email: 'test@testing.com',
         password: 'testtest' 
-      }
-    },
-    { describe: 'when given valid data',
-      it: 'should return a 400 ok',
-      errorsLength: 0,
-      responseCode: 200,
-      payload: {
+      };
+
+      return request(app).post('/register').send(payload).expect(400)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Validation_Error', response.error.type);
+        assert.equal(1, response.error.extendedInfo.length);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
+    });
+
+    //<TODO>: rewrite this it
+    it('should return a 200 response along with data: { user: {...}, token: {...}} when given valid input', function () {
+      var payload = {
         username: 'testing',
         email: 'test@testing.com',
         password: 'testtest1' 
-      }
-    }];
+      };
 
-    testData.forEach(function (testCase) {
-      describe(testCase.describe, function () {
-        it (testCase.it, function () {
-          return request(app)
-          .post('/register')
-          .send(testCase.payload)
-          .expect(testCase.responseCode)
-          .then(function (res) {
-            var response = JSON.parse(res.text);
-            if (testCase.statusText === 'Validation_Error') { assert.equal(testCase.error.errorsLength, response.error.errors.length); }
-          })
-          .catch(function (error) {
-            assert.ifError(error);
-          })
-        });
+      return request(app).post('/register').send(payload).expect(200)
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.data);
+        assert.isNotNull(response.data.user);
+        assert.isNotNull(response.data.token);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
       });
     });
   });
@@ -332,40 +221,37 @@ describe('Test registration controller', function () {
     // <TODO> most controller tests simply take a req res next, potentially all controller tests can
     // be abstracted out to a single function if the test data definition is correctly created
 
-    it.only('should return EmailTakenUser when given existing email', function () {
-      var payload = {
-        username: 'testtest',
-        email: 'testtest@gmail.com',
-        password: 'testtest1'
-      };
-
-      return testUtils.User.createTestUser(payload)
-      .then(function () {
-        return request(app).post('/register').send(payload).expect(400);
+    it('should return 400 response with error type Email_Taken when given existing email', function () {
+      return testUtils.User.createTestUser({ username: 'testtest', email: 'testtest@gmail.com', password: 'testtest1' })
+      .then(function (user) {
+        return request(app).post('/register').send({ username: 'testtestNEW', email: 'testtest@gmail.com', password: 'testtest1' }).expect(400);
       })
       .then(function (res) {
-        return console.log(res.body);
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Email_Taken', response.error.type);
       })
       .catch(function (error) {
         assert.ifError(error);
       });
     });
 
-    it('should return UsernameTakenError when given existing username', function () {
-      var payload = {
-        username: '',
-        email: '',
-        password: ''
-      };
+    it('should return 400 response with error type Username_Taken when given existing username', function () {
+      return testUtils.User.createTestUser({ username: 'testtest', email: 'testtest@gmail.com', password: 'testtest1' })
+      .then(function (user) {
+        return request(app).post('/register').send({ username: 'testtest', email: 'testtestNEW@gmail.com', password: 'testtest1' }).expect(400);
+      })
+      .then(function (res) {
+        var response = JSON.parse(res.text);
+        assert.isNotNull(response.error);
+        assert.equal('Username_Taken', response.error.type);
+      })
+      .catch(function (error) {
+        assert.ifError(error);
+      });
     });
 
-    it('should return OK with token and user objects when given valid data', function () {
-      var payload = {
-        username: '',
-        email: '',
-        password: ''
-      };
-    });
+    // it('should return OK with token and user objects when given valid data') THIS IS COVERED ABOVE
   });
 
   describe('/login intput validation', function () {
@@ -378,4 +264,3 @@ describe('Test registration controller', function () {
 
   afterEach('Clear User Database', testUtils.User.clearUserDatabase);
 });
-*/

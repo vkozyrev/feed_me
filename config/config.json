@@ -2,14 +2,14 @@
   "development": {
     "username": "developer",
     "password": "developer",
-    "database": "travel_app_develop",
+    "database": "feed_me_develop",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "developer",
     "password": "developer",
-    "database": "travel_app_test",
+    "database": "feed_me_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
