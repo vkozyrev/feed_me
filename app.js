@@ -89,7 +89,7 @@ if (app.get('env') === 'development') {
       error = new AppErrors.FieldValidationError(error.errors)
       return res.status(error.status).json(AppResponse.createResponseError(error.status, error.type, error));
     }
-    res.status(error.status || 500).json(AppResponse.createResponseError(500, error.type, error));
+    res.status(error.status || 500).json(AppResponse.createResponseError(error.status || 500, error.type, error));
   });
 }
 else {
@@ -100,7 +100,7 @@ else {
       error = new AppErrors.FieldValidationError(error.errors)
       return res.status(error.status).json(AppResponse.createResponseError(error.status, error.type, error));
     }
-    res.status(error.status || 500).json(AppResponse.createResponseError(500, error.type, error));
+    res.status(error.status || 500).json(AppResponse.createResponseError(error.status || 500, error.type, error));
   });
 }
 

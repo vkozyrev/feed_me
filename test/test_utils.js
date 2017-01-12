@@ -19,7 +19,7 @@ module.exports = {
         displayUsername: input.username,
         email: input.email
       });
-      return user.register('testtest1').then(function (user) { return user.save(); });
+      return user.register('testtest1').then(user.save);
     }
   }
 };
