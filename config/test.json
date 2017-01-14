@@ -6,7 +6,8 @@
       "password": "developer",
       "options": {
         "dialect": "mysql",
-        "host": "localhost"
+        "host": "localhost",
+        "logging": false
       }
     }
   }
