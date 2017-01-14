@@ -1,27 +1,27 @@
 'use strict';
 
-// Models
-var Meal = require('.').Meal
-  , User = require('.').User;
-
 module.exports = function(sequelize, DataTypes) {
   var UserMeal = sequelize.define('UserMeal', {
     userId: {
       type: DataTypes.INTEGER,
-      references: User,
-      key: 'id'
+      references: {
+        model: 'User',
+        key: 'id'
+      }
     },
     mealId: {
       type: DataTypes.INTEGER,
-      references: Meal,
-      key: 'id'
+      references: {
+        model: 'Meal',
+        key: 'id'
+      }
     },
     status: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
-        this.hasOne(Meal, foreignKey: 'mealId');
-        this.hasOne(User, foreignKey: 'userId');
+        this.belongsTo(models.Meal);
+        this.belongsTo(models.User);
       }
     }
   });
