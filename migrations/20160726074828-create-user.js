@@ -23,10 +23,10 @@ module.exports = {
         unique: true,
         type: Sequelize.STRING
       },
-      first_name: {
+      firstName: {
         type: Sequelize.STRING
       },
-      last_name: {
+      lastName: {
         type: Sequelize.STRING
       },
       bio: {

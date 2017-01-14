@@ -39,13 +39,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: true
     },
-    first_name: DataTypes.STRING,
-    last_name: DataTypes.STRING,
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
     bio: DataTypes.TEXT
   }, {
     classMethods: {
       associate: function (models) {
-        // associations can be defined here
+        this.belongsToMany(models.Meal, { through: 'UserMeals' });
       },
       // <TODO> Figure out what these do, when they are called and debug them
       serializeUser: function () {

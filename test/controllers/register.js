@@ -211,6 +211,7 @@ describe('Test registration controller', function () {
       .then(function (res) {
         var response = JSON.parse(res.text);
         assert.isNotNull(response.data);
+        //<TODO> Probably a good idea to add a method that checks the User is saved to the database
         assert.isNotNull(response.data.user);
         assert.isNotNull(response.data.token);
       })
